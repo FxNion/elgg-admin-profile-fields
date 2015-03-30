@@ -20,6 +20,8 @@
 		{
 			global $CONFIG;
 			
+			
+			// TODO: ne pas écraser les champs de profil par défaut
 			$profile_defaults = array (
 				'location' => 'tags',
 				'skills' => 'tags',
@@ -30,21 +32,35 @@
 				'contactemail' => 'email',
 				'phone' => 'text',
 				'mobile' => 'text',
-				'website' => 'url',
+				'website' => 'url'
+			);
+
+			$profile_admin = array (
 				
 				'admin_service_name' => 'tags',
-        'admin_manager' => 'tags',
-        'admin_office_address' => 'text',
-			  'admin_office_phone' => 'text',
-			  'admin_office_interests' => 'tags',
+				'admin_manager' => 'tags',
+				'admin_office_address' => 'text',
+				'admin_office_phone' => 'text',
+				'admin_office_interests' => 'tags',
 			);
-		
-			$CONFIG->profile = $profile_defaults;
-			$CONFIG->profile_admin_prefix = 'admin_';
+			
+			$profile_fields = elgg_get_config('profile_fields');
+
+			if (is_array($profile_fields) && count($profile_fields) > 0) {
+				$profile_fields= $profile_fields + $profile_admin;
+			}else{
+				$profile_fields= $profile_defaults + $profile_admin;
+			}
+			elgg_set_config('profile_fields',$profile_fields);
+			elgg_set_config('profile_admin_prefix','admin_');
 		
 		}
 		
+						
+		function admin_profile_init() {
+			admin_profile_fields_setup();
+		}
 		
-		register_elgg_event_handler('init','system','admin_profile_fields_setup',10000); // Ensure this runs after other plugins
+		elgg_register_event_handler('init', 'system', 'admin_profile_init', 100000);
 		
 ?>
